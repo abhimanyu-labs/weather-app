@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="app-card">
+    <header>
+      <h1>Weather App</h1>
+    </header>
+
+    <!-- Search Form -->
+    <form id="search-form" class="search-form">
+      <input 
+        type="text" 
+        id="city-input" 
+        placeholder="Enter city name..." 
+        autocomplete="off" 
+        required 
+      />
+      <button type="submit" id="search-btn">Search</button>
+    </form>
+
+    <!-- Status / Error Messages -->
+    <div id="status-message" class="status-message hidden"></div>
+
+    <!-- Weather Results Section -->
+    <section id="weather-card" class="weather-card hidden">
+      <div class="location-header">
+        <h2 id="city-name">--</h2>
+        <p id="weather-description">--</p>
+      </div>
+
+      <div class="temperature-container">
+        <span id="temp-value">--</span>
+        <span class="temp-unit">°C</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <span class="metric-title">Humidity</span>
+          <span id="humidity-value" class="metric-data">--</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-title">Wind Speed</span>
+          <span id="wind-value" class="metric-data">--</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
