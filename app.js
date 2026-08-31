@@ -8,7 +8,7 @@ const tempValEl = document.getElementById('temp-value');
 const humidityValEl = document.getElementById('humidity-value');
 const windValEl = document.getElementById('wind-value');
 
-searchFormEl.addEventListener('submit', async  (event) => {
+searchFormEl.addEventListener('submit', (event) => {
   event.preventDefault();
   weatherCardEl.classList.add('hidden');
   statusMessageEl.textContent = 'Fetching weather...';
@@ -21,6 +21,9 @@ searchFormEl.addEventListener('submit', async  (event) => {
 
 async function getLocation(cityName) {
   const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch location data from server.');
+  }
   const data = await response.json();
   if (!data.results || data.results.length === 0) {
     throw new Error(`Location ${cityName} not found.`);
@@ -46,9 +49,9 @@ async function renderWeatherCard(city) {
     const temp = weather.current.temperature_2m;
     const humidity = weather.current.relative_humidity_2m;
     const windSpeed = weather.current.wind_speed_10m;
-    const weatherDespcription = getWeatherDescription(weather.current.weather_code);
+    const weatherDescription = getWeatherDescription(weather.current.weather_code);
     cityNameEl.textContent = `${name}${country ? `, ${country}` : ''}`;
-    weatherDescEl.textContent = weatherDespcription;
+    weatherDescEl.textContent = weatherDescription;
     tempValEl.textContent = Math.round(temp);
     humidityValEl.textContent = `${humidity}%`;
     windValEl.textContent = `${windSpeed} Km/h`;
