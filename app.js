@@ -1,15 +1,26 @@
-const searchFormElement = document.getElementById("search-form");
-const cityInputElement = document.getElementById('city-input');
+const searchFormEl = document.getElementById("search-form");
+const cityInputEl = document.getElementById('city-input');
+const statusMessageEl = document.getElementById('status-message');
+const weatherCardEl = document.getElementById('weather-card');
+const cityNameEl = document.getElementById('city-name');
+const weatherDescEl = document.getElementById('weather-description');
+const tempValEl = document.getElementById('temp-value');
+const humidityValEl = document.getElementById('humidity-value');
+const windValEl = document.getElementById('wind-value');
 
-searchFormElement.addEventListener('submit', async  (event) => {
+searchFormEl.addEventListener('submit', async  (event) => {
   event.preventDefault();
-  const city = cityInputElement.value.trim();
+  weatherCardEl.classList.add('hidden');
+  statusMessageEl.textContent = 'Fetching weather...';
+  statusMessageEl.classList.remove('hidden');
+  const city = cityInputEl.value.trim();
+  cityInputEl.value = '';
   renderWeatherCard(city);
 })
 
 
 async function getLocation(cityName) {
-  const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityName}`);
+  const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}`);
   const data = await response.json();
   if (!data.results || data.results.length === 0) {
     throw new Error(`Location ${cityName} not found.`);
@@ -20,6 +31,9 @@ async function getLocation(cityName) {
 
 async function getWeather(lat, lon) {
   const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch weather data from server.')
+  }
   const data = await response.json();
   return data;
 }
@@ -33,22 +47,18 @@ async function renderWeatherCard(city) {
     const humidity = weather.current.relative_humidity_2m;
     const windSpeed = weather.current.wind_speed_10m;
     const weatherDespcription = getWeatherDescription(weather.current.weather_code);
-    document.getElementById('city-name')
-      .textContent = `${name}${country ? `, ${country}` : ''}`;
-    document.getElementById('weather-description')
-      .textContent = weatherDespcription;
-    document.getElementById('temp-value')
-      .textContent = temp;
-    document.getElementById('humidity-value')
-      .textContent = `${humidity}%`;
-    document.getElementById('wind-value')
-      .textContent = `${windSpeed} Km/h`;
-    document.getElementById('status-message').classList.add('hidden');
-    document.getElementById('weather-card').classList.remove('hidden');
+    cityNameEl.textContent = `${name}${country ? `, ${country}` : ''}`;
+    weatherDescEl.textContent = weatherDespcription;
+    tempValEl.textContent = Math.round(temp);
+    humidityValEl.textContent = `${humidity}%`;
+    windValEl.textContent = `${windSpeed} Km/h`;
+    statusMessageEl.classList.add('hidden');
+    statusMessageEl.textContent = '';
+    weatherCardEl.classList.remove('hidden');
   } catch(error) {
-    document.getElementById('weather-card').classList.add('hidden');
-    document.getElementById('status-message').textContent = error.message || 'Something went wrong. Please try again later.';
-    document.getElementById('status-message').classList.remove('hidden');
+    weatherCardEl.classList.add('hidden');
+    statusMessageEl.textContent = error.message || 'Something went wrong. Please try again later.';
+    statusMessageEl.classList.remove('hidden');
   }
   
 }
