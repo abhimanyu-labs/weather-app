@@ -11,6 +11,9 @@ searchFormElement.addEventListener('submit', async  (event) => {
 async function getLocation(cityName) {
   const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityName}`);
   const data = await response.json();
+  if (!data.results || data.results.length === 0) {
+    throw new Error(`Location ${cityName} not found.`);
+  }
   const location = data.results[0];
   return location;
 }
@@ -31,7 +34,7 @@ async function renderWeatherCard(city) {
     const windSpeed = weather.current.wind_speed_10m;
     const weatherDespcription = getWeatherDescription(weather.current.weather_code);
     document.getElementById('city-name')
-      .textContent = `${name}, ${country}`;
+      .textContent = `${name}${country ? `, ${country}` : ''}`;
     document.getElementById('weather-description')
       .textContent = weatherDespcription;
     document.getElementById('temp-value')
@@ -40,9 +43,11 @@ async function renderWeatherCard(city) {
       .textContent = `${humidity}%`;
     document.getElementById('wind-value')
       .textContent = `${windSpeed} Km/h`;
+    document.getElementById('status-message').classList.add('hidden');
     document.getElementById('weather-card').classList.remove('hidden');
   } catch(error) {
-    document.getElementById('status-message').textContent = 'Network issue. Please try again later.'
+    document.getElementById('weather-card').classList.add('hidden');
+    document.getElementById('status-message').textContent = error.message || 'Something went wrong. Please try again later.';
     document.getElementById('status-message').classList.remove('hidden');
   }
   
@@ -89,5 +94,5 @@ function getWeatherDescription(weather_code) {
     99: "Thunderstorm with heavy hail"
   };
 
-  return weatherDescriptions[weather_code];
+  return weatherDescriptions[weather_code] || 'Unknown weather condition';
 }
